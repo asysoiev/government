@@ -20,6 +20,6 @@ public class CitizensJdbcDao implements CitizensDao {
 
     @Override
     public List<Citizen> findAll() {
-        return jdbcTemplate.query("select * from citizen", new BeanPropertyRowMapper<>());
+        return jdbcTemplate.query("select * from citizen", new BeanPropertyRowMapper<>(Citizen.class));
     }
 }
