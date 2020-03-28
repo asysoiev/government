@@ -12,6 +12,7 @@ public class Citizen {
     private String surname;
     private LocalDate birthday;
     private String gender;
+    private LocalDate deathDate;
     private String comment;
 
     public Citizen() {
@@ -63,6 +64,14 @@ public class Citizen {
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public LocalDate getDeathDate() {
+        return deathDate;
+    }
+
+    public void setDeathDate(LocalDate deathDate) {
+        this.deathDate = deathDate;
     }
 
     public String getComment() {

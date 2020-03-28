@@ -11,6 +11,7 @@ create table citizen
     surname   varchar(255) not null,
     birthday  date,
     gender    char         not null,
+    death_date    date,
     comment   varchar(255),
     primary key (id),
     unique (identifier)

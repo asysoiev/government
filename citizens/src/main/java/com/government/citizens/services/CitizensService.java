@@ -30,4 +30,13 @@ public interface CitizensService {
      */
     int deleteById(Long id);
 
+    Citizen createCitizen(Citizen citizen);
+
+    /**
+     * Updates the citizen if it is exist, else create a new one.
+     *
+     * @param citizen
+     * @return
+     */
+    Citizen updateOrCreateCitizen(Citizen citizen);
 }
