@@ -3,6 +3,7 @@ package com.government.citizens.dao.jdbc;
 import com.government.citizens.dao.CitizensDao;
 import com.government.citizens.models.Citizen;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -25,7 +26,17 @@ public class CitizensJdbcDao implements CitizensDao {
 
     @Override
     public Citizen findById(Long id) {
-        return jdbcTemplate.queryForObject("select * from citizen where id=?", new Object[]{id},
-                new BeanPropertyRowMapper<>(Citizen.class));
+        try {
+            return jdbcTemplate.queryForObject("select * from citizen where id=?", new Object[]{id},
+                    new BeanPropertyRowMapper<>(Citizen.class)
+            );
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public int deleteById(Long id) {
+        return jdbcTemplate.update("delete from citizen where id=?", new Object[]{id});
     }
 }

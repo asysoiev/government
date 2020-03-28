@@ -12,4 +12,6 @@ public interface CitizensDao {
     List<Citizen> findAll();
 
     Citizen findById(Long id);
+
+    int deleteById(Long id);
 }
