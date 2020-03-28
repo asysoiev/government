@@ -22,4 +22,10 @@ public class CitizensJdbcDao implements CitizensDao {
     public List<Citizen> findAll() {
         return jdbcTemplate.query("select * from citizen", new BeanPropertyRowMapper<>(Citizen.class));
     }
+
+    @Override
+    public Citizen findById(Long id) {
+        return jdbcTemplate.queryForObject("select * from citizen where id=?", new Object[]{id},
+                new BeanPropertyRowMapper<>(Citizen.class));
+    }
 }

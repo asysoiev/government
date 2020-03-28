@@ -4,6 +4,7 @@ import com.government.citizens.dao.CitizensDao;
 import com.government.citizens.models.Citizen;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -20,6 +21,11 @@ public class CitizensResController {
     @GetMapping(path = "/citizens")
     public List<Citizen> getAll() {
         return citizensDao.findAll();
+    }
+
+    @GetMapping(path = "/citizens/{id}")
+    public Citizen getCitizenById(@PathVariable Long id) {
+        return citizensDao.findById(id);
     }
 
 }

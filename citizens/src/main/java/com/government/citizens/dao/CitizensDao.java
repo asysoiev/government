@@ -10,4 +10,6 @@ import java.util.List;
 public interface CitizensDao {
 
     List<Citizen> findAll();
+
+    Citizen findById(Long id);
 }
