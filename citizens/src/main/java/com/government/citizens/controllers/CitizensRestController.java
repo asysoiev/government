@@ -21,7 +21,7 @@ import java.util.Objects;
  * @author Andrii Sysoiev
  */
 @RestController
-public class CitizensResController {
+public class CitizensRestController {
 
     @Autowired
     private CitizensService citizensService;
