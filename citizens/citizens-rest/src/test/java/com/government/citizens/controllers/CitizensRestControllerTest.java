@@ -175,6 +175,43 @@ public class CitizensRestControllerTest {
     }
 
     /**
+     * Checks citizen creation by update request, when id is not found.
+     *
+     * @throws Exception
+     */
+    @Test
+    void testCreateOrUpdate_CreateCitizen() throws Exception {
+        //prepare data
+        long id = 777;
+        String name = "Eric";
+        String surname = "Amber";
+        String gender = "M";
+        LocalDate birthday = of(now().minusYears(400).getYear(), AUGUST, 2);
+        Object[] params = {name, id};
+        String query = "select count(*) from citizen where name=? or id=?";
+        int count = jdbcTemplate.queryForObject(query, params, Integer.class);
+        assertEquals(0, count);
+
+        //request
+        String content = "{\n" +
+                "        \"name\": \"" + name + "\",\n" +
+                "        \"surname\": \"" + surname + "\",\n" +
+                "        \"birthday\": \"" + birthday.toString() + "\",\n" +
+                "        \"gender\": \"" + gender + "\"\n" +
+                " }";
+        MockHttpServletRequestBuilder request = put("/citizens/{1}", id)
+                .header(CONTENT_TYPE, APPLICATION_JSON)
+                .content(content);
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is(name)));
+
+        //check result
+        count = jdbcTemplate.queryForObject(query, params, Integer.class);
+        assertEquals(1, count);
+    }
+
+    /**
      * Checks successful citizen deletion.
      */
     @Test

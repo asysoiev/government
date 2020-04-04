@@ -75,6 +75,7 @@ public class CitizensServiceImpl implements CitizensService {
             }).get();
             return citizensDao.save(updatedCitizen);
         } else {
+            citizen.setId(null);
             return createCitizen(citizen);
         }
     }
