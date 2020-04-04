@@ -15,7 +15,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author Andrii Sysoiev
@@ -49,21 +48,10 @@ public class CitizensRestController {
     }
 
     @PutMapping(path = "/citizens/{id}")
-    public ResponseEntity<Object> updateOrCreateCitizen(@PathVariable Long id, @RequestBody Citizen citizen) {
+    public ResponseEntity<Object> updateCitizen(@PathVariable Long id, @RequestBody Citizen citizen) {
         citizen.setId(id);
-        Citizen saved = citizensService.updateOrCreateCitizen(citizen);
-        if (!Objects.equals(saved.getId(), citizen.getId())) {
-            //created
-            URI location = ServletUriComponentsBuilder
-                    .fromCurrentRequest().path("/{id}")
-                    .buildAndExpand(saved.getId())
-                    .toUri();
-
-            return ResponseEntity.created(location).build();
-        } else {
-            //updated
-            return ResponseEntity.ok(saved);
-        }
+        Citizen saved = citizensService.updateCitizen(citizen);
+        return ResponseEntity.ok(saved);
     }
 
     @DeleteMapping(path = "/citizens/{id}")

@@ -53,30 +53,22 @@ public class CitizensServiceImpl implements CitizensService {
     }
 
     @Override
-    public Citizen updateOrCreateCitizen(Citizen citizen) {
-        Optional<Citizen> optional = citizensDao.findById(citizen.getId());
-        if (optional.isPresent()) {
-            Citizen updatedCitizen = optional.map(rec -> {
-                if (citizen.getName() != null) {
-                    rec.setName(citizen.getName());
-                }
-                if (citizen.getSurname() != null) {
-                    rec.setSurname(citizen.getSurname());
-                }
-                if (citizen.getBirthday() != null) {
-                    rec.setBirthday(citizen.getBirthday());
-                }
-                if (citizen.getGender() != null) {
-                    rec.setGender(citizen.getGender());
-                }
-                rec.setDeathDate(citizen.getDeathDate());
-                rec.setComment(citizen.getComment());
-                return rec;
-            }).get();
-            return citizensDao.save(updatedCitizen);
-        } else {
-            citizen.setId(null);
-            return createCitizen(citizen);
+    public Citizen updateCitizen(Citizen citizen) {
+        Citizen dbCitizen = findById(citizen.getId());
+        if (citizen.getName() != null) {
+            dbCitizen.setName(citizen.getName());
         }
+        if (citizen.getSurname() != null) {
+            dbCitizen.setSurname(citizen.getSurname());
+        }
+        if (citizen.getBirthday() != null) {
+            dbCitizen.setBirthday(citizen.getBirthday());
+        }
+        if (citizen.getGender() != null) {
+            dbCitizen.setGender(citizen.getGender());
+        }
+        dbCitizen.setDeathDate(citizen.getDeathDate());
+        dbCitizen.setComment(citizen.getComment());
+        return citizensDao.save(dbCitizen);
     }
 }

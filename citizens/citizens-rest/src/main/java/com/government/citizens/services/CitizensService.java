@@ -38,5 +38,5 @@ public interface CitizensService {
      * @param citizen
      * @return
      */
-    Citizen updateOrCreateCitizen(Citizen citizen);
+    Citizen updateCitizen(Citizen citizen);
 }
