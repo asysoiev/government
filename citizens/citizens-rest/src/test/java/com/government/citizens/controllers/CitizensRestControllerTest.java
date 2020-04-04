@@ -96,4 +96,21 @@ public class CitizensRestControllerTest {
         int count = jdbcTemplate.queryForObject("select count(*) from citizen where name=?", params, Integer.class);
         assertEquals(0, count);
     }
+
+    private static final String getCitizenNotFoundMessage(long id) {
+        return String.format("Citizen: \"%d\" not found.", id);
+    }
+
+    @Test
+    void testDeleteCitizen_NotFound() throws Exception {
+        long id = 777L;
+        Object[] params = {id};
+        int count = jdbcTemplate.queryForObject("select count(*) from citizen where id=?", params, Integer.class);
+        assertEquals(0, count);
+
+        MockHttpServletRequestBuilder request = delete("/citizens/{1}", id);
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is(getCitizenNotFoundMessage(id))));
+    }
 }
