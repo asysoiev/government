@@ -34,6 +34,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class CitizensRestControllerTest {
 
+    private static final String VALIDATION_ERR_MESSAGE = "Validation error!";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -93,6 +95,30 @@ public class CitizensRestControllerTest {
         assertEquals(1, count);
     }
 
+    private static String getRequiredFieldMessage(String field) {
+        return String.format("Citizen is invalid: \"%s\" field is required!", field);
+    }
+
+    @Test
+    void testCreateCitizen_NameIsRequired() throws Exception {
+        String surname = "Amber";
+        String gender = "M";
+        LocalDate birthday = of(now().minusYears(400).getYear(), AUGUST, 2);
+
+        String content = "{\n" +
+                "        \"surname\": \"" + surname + "\",\n" +
+                "        \"birthday\": \"" + birthday.toString() + "\",\n" +
+                "        \"gender\": \"" + gender + "\"\n" +
+                " }";
+        MockHttpServletRequestBuilder request = post("/citizens")
+                .header(CONTENT_TYPE, APPLICATION_JSON)
+                .content(content);
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is(VALIDATION_ERR_MESSAGE)))
+                .andExpect(jsonPath("$.details", is(getRequiredFieldMessage("name"))));
+    }
+
     /**
      * Checks successful citizen deletion.
      */
@@ -112,6 +138,26 @@ public class CitizensRestControllerTest {
 
     private static String getCitizenNotFoundMessage(long id) {
         return String.format("Citizen: \"%d\" not found.", id);
+    }
+
+    @Test
+    void testCreateCitizen_SurnameIsRequired() throws Exception {
+        String name = "Eric";
+        String gender = "M";
+        LocalDate birthday = of(now().minusYears(400).getYear(), AUGUST, 2);
+
+        String content = "{\n" +
+                "        \"name\": \"" + name + "\",\n" +
+                "        \"birthday\": \"" + birthday.toString() + "\",\n" +
+                "        \"gender\": \"" + gender + "\"\n" +
+                " }";
+        MockHttpServletRequestBuilder request = post("/citizens")
+                .header(CONTENT_TYPE, APPLICATION_JSON)
+                .content(content);
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is(VALIDATION_ERR_MESSAGE)))
+                .andExpect(jsonPath("$.details", is(getRequiredFieldMessage("surname"))));
     }
 
     @Test
