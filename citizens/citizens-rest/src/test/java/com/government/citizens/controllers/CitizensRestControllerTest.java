@@ -95,10 +95,6 @@ public class CitizensRestControllerTest {
         assertEquals(1, count);
     }
 
-    private static String getRequiredFieldMessage(String field) {
-        return String.format("Citizen is invalid: \"%s\" field is required!", field);
-    }
-
     @Test
     void testCreateCitizen_NameIsRequired() throws Exception {
         String surname = "Amber";
@@ -117,27 +113,6 @@ public class CitizensRestControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", is(VALIDATION_ERR_MESSAGE)))
                 .andExpect(jsonPath("$.details", is(getRequiredFieldMessage("name"))));
-    }
-
-    /**
-     * Checks successful citizen deletion.
-     */
-    @Test
-    void testDeleteCitizen() throws Exception {
-        String name = "Oberon";
-        Object[] params = {name};
-        Long id = jdbcTemplate.queryForObject("select id from citizen where name=?", params, Long.class);
-
-        MockHttpServletRequestBuilder request = delete("/citizens/{1}", id);
-        mockMvc.perform(request)
-                .andExpect(status().isOk());
-
-        int count = jdbcTemplate.queryForObject("select count(*) from citizen where name=?", params, Integer.class);
-        assertEquals(0, count);
-    }
-
-    private static String getCitizenNotFoundMessage(long id) {
-        return String.format("Citizen: \"%d\" not found.", id);
     }
 
     @Test
@@ -160,6 +135,27 @@ public class CitizensRestControllerTest {
                 .andExpect(jsonPath("$.details", is(getRequiredFieldMessage("surname"))));
     }
 
+    private static String getRequiredFieldMessage(String field) {
+        return String.format("Citizen is invalid: \"%s\" field is required!", field);
+    }
+
+    /**
+     * Checks successful citizen deletion.
+     */
+    @Test
+    void testDeleteCitizen() throws Exception {
+        String name = "Oberon";
+        Object[] params = {name};
+        Long id = jdbcTemplate.queryForObject("select id from citizen where name=?", params, Long.class);
+
+        MockHttpServletRequestBuilder request = delete("/citizens/{1}", id);
+        mockMvc.perform(request)
+                .andExpect(status().isOk());
+
+        int count = jdbcTemplate.queryForObject("select count(*) from citizen where name=?", params, Integer.class);
+        assertEquals(0, count);
+    }
+
     @Test
     void testDeleteCitizen_NotFound() throws Exception {
         long id = 777L;
@@ -171,5 +167,9 @@ public class CitizensRestControllerTest {
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message", is(getCitizenNotFoundMessage(id))));
+    }
+
+    private static String getCitizenNotFoundMessage(long id) {
+        return String.format("Citizen: \"%d\" not found.", id);
     }
 }
