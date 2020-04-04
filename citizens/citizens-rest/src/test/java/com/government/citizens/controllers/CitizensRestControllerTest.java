@@ -17,14 +17,17 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
+ * Integration tests for CitizensRest API.
+ * Checks all layers.
+ *
  * @author Andrii Sysoiev
  */
 @SpringBootTest
@@ -45,6 +48,10 @@ public class CitizensRestControllerTest {
                 .andExpect(jsonPath("$.length()", is(6)));
     }
 
+    /**
+     * Checks successful citizen creation.
+     * Identifier must be generated.
+     */
     @Test
     void testCreateCitizen() throws Exception {
         String name = "Eric";
@@ -62,7 +69,6 @@ public class CitizensRestControllerTest {
                 .header(CONTENT_TYPE, APPLICATION_JSON)
                 .content(content);
         mockMvc.perform(request)
-                .andDo(print())
 //                .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
@@ -72,5 +78,22 @@ public class CitizensRestControllerTest {
         Object[] params = {name, surname, gender, birthday};
         Integer count = jdbcTemplate.queryForObject(query, params, Integer.class);
         assertEquals(1, count);
+    }
+
+    /**
+     * Checks successful citizen deletion.
+     */
+    @Test
+    void testDeleteCitizen() throws Exception {
+        String name = "Oberon";
+        Object[] params = {name};
+        Long id = jdbcTemplate.queryForObject("select id from citizen where name=?", params, Long.class);
+
+        MockHttpServletRequestBuilder request = delete("/citizens/{1}", id);
+        mockMvc.perform(request)
+                .andExpect(status().isOk());
+
+        int count = jdbcTemplate.queryForObject("select count(*) from citizen where name=?", params, Integer.class);
+        assertEquals(0, count);
     }
 }
