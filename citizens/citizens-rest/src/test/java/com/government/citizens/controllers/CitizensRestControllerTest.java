@@ -15,11 +15,13 @@ import static java.time.LocalDate.of;
 import static java.time.Month.AUGUST;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -137,6 +139,39 @@ public class CitizensRestControllerTest {
 
     private static String getRequiredFieldMessage(String field) {
         return String.format("Citizen is invalid: \"%s\" field is required!", field);
+    }
+
+    @Test
+    void testCreateOrUpdate_UpdateCitizen() throws Exception {
+        //prepare data
+        String name = "Oberon";
+        Object[] selectIdParams = {name};
+        String selectIdQuery = "select id from citizen where name=? and comment is null and death_date is null";
+        Long id = jdbcTemplate.queryForObject(selectIdQuery, selectIdParams, Long.class);
+        assertNotNull(id);
+
+        LocalDate deathDate = of(now().minusYears(100).getYear(), AUGUST, 2);
+        String comment = "Dead";
+
+        //request
+        String content = "{\n" +
+                "        \"deathDate\": \"" + deathDate + "\",\n" +
+                "        \"comment\": \"" + comment + "\"\n" +
+                " }";
+        MockHttpServletRequestBuilder request = put("/citizens/{1}", id)
+                .header(CONTENT_TYPE, APPLICATION_JSON)
+                .content(content);
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is(name)))
+                .andExpect(jsonPath("$.deathDate", is(deathDate.toString())))
+                .andExpect(jsonPath("$.comment", is(comment)));
+
+        //check result
+        String checkResultQuery = "select count(*) from citizen where name=? and death_date=? and comment=?";
+        Object[] checkResultParams = {name, deathDate, comment};
+        int count = jdbcTemplate.queryForObject(checkResultQuery, checkResultParams, Integer.class);
+        assertEquals(1, count);
     }
 
     /**

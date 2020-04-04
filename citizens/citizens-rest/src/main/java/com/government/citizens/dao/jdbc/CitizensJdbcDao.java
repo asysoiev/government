@@ -111,12 +111,14 @@ public class CitizensJdbcDao implements CitizensDao {
                         "birthday = ?, " +
                         "gender = ?, " +
                         "death_date = ?, " +
-                        "comment = ? ",
+                        "comment = ? " +
+                        "where id = ?",
                 new Object[]{citizen.getName(),
                         citizen.getSurname(),
                         citizen.getBirthday(),
                         citizen.getGender(),
-                        citizen.getDeathDate(), citizen.getComment()});
+                        citizen.getDeathDate(), citizen.getComment(),
+                        citizen.getId()});
         return citizen;
     }
 
