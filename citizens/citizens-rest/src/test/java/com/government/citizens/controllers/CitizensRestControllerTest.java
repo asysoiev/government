@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 
 import static java.time.LocalDate.now;
@@ -32,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * @author Andrii Sysoiev
  */
+@Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
 public class CitizensRestControllerTest {
