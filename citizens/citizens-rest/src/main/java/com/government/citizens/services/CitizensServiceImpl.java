@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.UUID.randomUUID;
+import static org.springframework.util.StringUtils.isEmpty;
+
 /**
  * @author Andrii Sysoiev
  */
@@ -43,6 +46,9 @@ public class CitizensServiceImpl implements CitizensService {
 
     @Override
     public Citizen createCitizen(Citizen citizen) {
+        if (isEmpty(citizen.getIdentifier())) {
+            citizen.setIdentifier(randomUUID());
+        }
         return citizensDao.save(citizen);
     }
 

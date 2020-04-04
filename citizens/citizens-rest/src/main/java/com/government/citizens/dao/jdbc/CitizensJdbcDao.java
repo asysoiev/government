@@ -89,6 +89,7 @@ public class CitizensJdbcDao implements CitizensDao {
         Map<String, Object> args = new HashMap<>();
         args.put("name", citizen.getName());
         args.put("surname", citizen.getSurname());
+        args.put("identifier", citizen.getIdentifier());
         args.put("birthday", citizen.getBirthday());
         args.put("gender", citizen.getGender());
         args.put("death_date", citizen.getDeathDate());

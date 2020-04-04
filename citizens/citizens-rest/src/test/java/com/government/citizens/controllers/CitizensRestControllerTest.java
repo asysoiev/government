@@ -66,7 +66,7 @@ public class CitizensRestControllerTest {
 //                .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
-        String query = "select count(*) from citizen where name=? and surname=? and gender=?";
+        String query = "select count(*) from citizen where name=? and surname=? and gender=? and identifier is not null";
         Object[] params = {name, surname, gender};
         Integer count = jdbcTemplate.queryForObject(query, params, Integer.class);
         assertEquals(1, count);

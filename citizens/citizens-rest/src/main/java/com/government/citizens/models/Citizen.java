@@ -1,13 +1,14 @@
 package com.government.citizens.models;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 /**
  * @author Andrii Sysoiev
  */
 public class Citizen {
     private Long id;
-    private String identifier;
+    private UUID identifier;
     private String name;
     private String surname;
     private LocalDate birthday;
@@ -26,11 +27,11 @@ public class Citizen {
         this.id = id;
     }
 
-    public String getIdentifier() {
+    public UUID getIdentifier() {
         return identifier;
     }
 
-    public void setIdentifier(String identifier) {
+    public void setIdentifier(UUID identifier) {
         this.identifier = identifier;
     }
 
