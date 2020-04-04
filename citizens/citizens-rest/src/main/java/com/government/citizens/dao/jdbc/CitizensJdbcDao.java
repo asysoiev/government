@@ -3,6 +3,7 @@ package com.government.citizens.dao.jdbc;
 import com.government.citizens.dao.CitizensDao;
 import com.government.citizens.models.Citizen;
 import com.government.citizens.models.Gender;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.time.LocalDate.now;
+import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.util.StringUtils.isEmpty;
 
 /**
@@ -25,6 +27,8 @@ import static org.springframework.util.StringUtils.isEmpty;
  */
 @Repository
 public class CitizensJdbcDao implements CitizensDao {
+
+    private static final Logger logger = getLogger(CitizensJdbcDao.class);
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -62,14 +66,15 @@ public class CitizensJdbcDao implements CitizensDao {
 
     @Override
     public Optional<Citizen> findById(Long id) {
+        Citizen dbResult = null;
         try {
-            Citizen dbResult = jdbcTemplate.queryForObject("select * from citizen where id=?", new Object[]{id},
+            dbResult = jdbcTemplate.queryForObject("select * from citizen where id=?", new Object[]{id},
                     new BeanPropertyRowMapper<>(Citizen.class)
             );
-            return Optional.ofNullable(dbResult);
         } catch (EmptyResultDataAccessException e) {
-            return null;
+            logger.warn("Citizen \"{}\" not found", id);
         }
+        return Optional.ofNullable(dbResult);
     }
 
     @Override

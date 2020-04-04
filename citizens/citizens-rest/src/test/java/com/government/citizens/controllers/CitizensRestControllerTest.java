@@ -48,6 +48,19 @@ public class CitizensRestControllerTest {
                 .andExpect(jsonPath("$.length()", is(6)));
     }
 
+    @Test
+    void testGetCitizen_NotFound() throws Exception {
+        long id = 888L;
+        Object[] params = {id};
+        int count = jdbcTemplate.queryForObject("select count(*) from citizen where id=?", params, Integer.class);
+        assertEquals(0, count);
+
+        MockHttpServletRequestBuilder request = get("/citizens/{1}", id);
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is(getCitizenNotFoundMessage(id))));
+    }
+
     /**
      * Checks successful citizen creation.
      * Identifier must be generated.
@@ -97,7 +110,7 @@ public class CitizensRestControllerTest {
         assertEquals(0, count);
     }
 
-    private static final String getCitizenNotFoundMessage(long id) {
+    private static String getCitizenNotFoundMessage(long id) {
         return String.format("Citizen: \"%d\" not found.", id);
     }
 
