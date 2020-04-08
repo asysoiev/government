@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import static java.time.LocalDate.now;
 import static java.time.LocalDate.of;
 import static java.time.Month.AUGUST;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -119,6 +120,24 @@ public class CitizensRestControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", is(VALIDATION_ERR_MESSAGE)))
                 .andExpect(jsonPath("$.details", is(getRequiredFieldMessage("name"))));
+    }
+
+    @Test
+    void testCreateCitizen_WrongGenderValue() throws Exception {
+        String surname = "Amber";
+        String gender = "S";
+
+        String content = "{\n" +
+                "        \"surname\": \"" + surname + "\",\n" +
+                "        \"gender\": \"" + gender + "\"\n" +
+                " }";
+        MockHttpServletRequestBuilder request = post("/citizens")
+                .header(CONTENT_TYPE, APPLICATION_JSON)
+                .content(content);
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is(VALIDATION_ERR_MESSAGE)))
+                .andExpect(jsonPath("$.details", containsString("\"S\": not one of the values accepted for Enum class: [M, F];")));
     }
 
     @Test

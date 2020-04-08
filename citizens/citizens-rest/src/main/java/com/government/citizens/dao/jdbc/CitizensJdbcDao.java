@@ -2,7 +2,6 @@ package com.government.citizens.dao.jdbc;
 
 import com.government.citizens.dao.CitizensDao;
 import com.government.citizens.models.Citizen;
-import com.government.citizens.models.Gender;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -12,7 +11,6 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import javax.validation.ValidationException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,13 +49,8 @@ public class CitizensJdbcDao implements CitizensDao {
         if (citizen.getBirthday().isAfter(now())) {
             throw new ValidationException("Citizen is invalid: \"birthday\" can not be after current date!");
         }
-        if (isEmpty(citizen.getGender())) {
+        if (citizen.getGender() == null) {
             throw new ValidationException("Citizen is invalid: \"gender\" field is required!");
-        }
-        Gender gender = Gender.fromString(citizen.getGender());
-        if (gender == null) {
-            String msg = String.format("Citizen is invalid: \"gender\" must be one of: %s!", Arrays.toString(Gender.values()));
-            throw new ValidationException(msg);
         }
         if (citizen.getDeathDate() != null && citizen.getDeathDate().isAfter(now())) {
             throw new ValidationException("Citizen is invalid: \"deathDate\" can not be after current date!");
@@ -96,7 +89,7 @@ public class CitizensJdbcDao implements CitizensDao {
         args.put("surname", citizen.getSurname());
         args.put("identifier", citizen.getIdentifier());
         args.put("birthday", citizen.getBirthday());
-        args.put("gender", citizen.getGender());
+        args.put("gender", citizen.getGender().toString());
         args.put("death_date", citizen.getDeathDate());
         args.put("comment", citizen.getComment());
         Long id = (Long) simpleJdbcInsert.executeAndReturnKey(args);
@@ -116,7 +109,7 @@ public class CitizensJdbcDao implements CitizensDao {
                 new Object[]{citizen.getName(),
                         citizen.getSurname(),
                         citizen.getBirthday(),
-                        citizen.getGender(),
+                        citizen.getGender().toString(),
                         citizen.getDeathDate(), citizen.getComment(),
                         citizen.getId()});
         return citizen;

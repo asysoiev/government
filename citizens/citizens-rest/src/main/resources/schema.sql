@@ -14,5 +14,6 @@ create table citizen
     death_date    date,
     comment   varchar(255),
     primary key (id),
-    unique (identifier)
+    unique (identifier),
+    check (gender in ('M', 'F'))
 );

@@ -12,7 +12,7 @@ public class Citizen {
     private String name;
     private String surname;
     private LocalDate birthday;
-    private String gender;
+    private Gender gender;
     private LocalDate deathDate;
     private String comment;
 
@@ -59,11 +59,11 @@ public class Citizen {
         this.birthday = birthday;
     }
 
-    public String getGender() {
+    public Gender getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
+    public void setGender(Gender gender) {
         this.gender = gender;
     }
 
