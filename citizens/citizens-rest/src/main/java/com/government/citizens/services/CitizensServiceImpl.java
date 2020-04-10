@@ -6,9 +6,11 @@ import com.government.citizens.models.Citizen;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.validation.ValidationException;
 import java.util.List;
 import java.util.Optional;
 
+import static java.time.LocalDate.now;
 import static java.util.UUID.randomUUID;
 import static org.springframework.util.StringUtils.isEmpty;
 
@@ -35,13 +37,31 @@ public class CitizensServiceImpl implements CitizensService {
         return result.get();
     }
 
-    @Override
-    public int deleteById(Long id) {
-        int rows = citizensDao.deleteById(id);
-        if (rows == 0) {
-            throw new CitizenNotFoundException(id);
+    private static void validate(Citizen citizen) {
+        if (isEmpty(citizen.getName())) {
+            throw new ValidationException("Citizen is invalid: \"name\" field is required!");
         }
-        return rows;
+        if (isEmpty(citizen.getSurname())) {
+            throw new ValidationException("Citizen is invalid: \"surname\" field is required!");
+        }
+        if (citizen.getBirthday() == null) {
+            throw new ValidationException("Citizen is invalid: \"birthday\" field is required!");
+        }
+        if (citizen.getBirthday().isAfter(now())) {
+            throw new ValidationException("Citizen is invalid: \"birthday\" can not be after current date!");
+        }
+        if (citizen.getGender() == null) {
+            throw new ValidationException("Citizen is invalid: \"gender\" field is required!");
+        }
+        if (citizen.getDeathDate() != null && citizen.getDeathDate().isAfter(now())) {
+            throw new ValidationException("Citizen is invalid: \"deathDate\" can not be after current date!");
+        }
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        findById(id);
+        citizensDao.deleteById(id);
     }
 
     @Override
@@ -49,7 +69,7 @@ public class CitizensServiceImpl implements CitizensService {
         if (isEmpty(citizen.getIdentifier())) {
             citizen.setIdentifier(randomUUID());
         }
-        return citizensDao.save(citizen);
+        return save(citizen);
     }
 
     @Override
@@ -69,6 +89,12 @@ public class CitizensServiceImpl implements CitizensService {
         }
         dbCitizen.setDeathDate(citizen.getDeathDate());
         dbCitizen.setComment(citizen.getComment());
-        return citizensDao.save(dbCitizen);
+        return save(dbCitizen);
+    }
+
+    //    @Transactional
+    private Citizen save(Citizen citizen) {
+        validate(citizen);
+        return citizensDao.save(citizen);
     }
 }

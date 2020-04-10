@@ -32,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Integration tests for CitizensRest API.
  * Checks all layers.
+ * With default DB layer implementation - JPA.
  *
  * @author Andrii Sysoiev
  */

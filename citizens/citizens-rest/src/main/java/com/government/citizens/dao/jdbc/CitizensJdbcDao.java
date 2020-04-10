@@ -4,25 +4,24 @@ import com.government.citizens.dao.CitizensDao;
 import com.government.citizens.models.Citizen;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
-import javax.validation.ValidationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static java.time.LocalDate.now;
 import static org.slf4j.LoggerFactory.getLogger;
-import static org.springframework.util.StringUtils.isEmpty;
 
 /**
  * @author Andrii Sysoiev
  */
+@Profile("JDBC")
 @Repository
 public class CitizensJdbcDao implements CitizensDao {
 
@@ -34,27 +33,6 @@ public class CitizensJdbcDao implements CitizensDao {
     @Override
     public List<Citizen> findAll() {
         return jdbcTemplate.query("select * from citizen", new BeanPropertyRowMapper<>(Citizen.class));
-    }
-
-    private static void validate(Citizen citizen) {
-        if (isEmpty(citizen.getName())) {
-            throw new ValidationException("Citizen is invalid: \"name\" field is required!");
-        }
-        if (isEmpty(citizen.getSurname())) {
-            throw new ValidationException("Citizen is invalid: \"surname\" field is required!");
-        }
-        if (citizen.getBirthday() == null) {
-            throw new ValidationException("Citizen is invalid: \"birthday\" field is required!");
-        }
-        if (citizen.getBirthday().isAfter(now())) {
-            throw new ValidationException("Citizen is invalid: \"birthday\" can not be after current date!");
-        }
-        if (citizen.getGender() == null) {
-            throw new ValidationException("Citizen is invalid: \"gender\" field is required!");
-        }
-        if (citizen.getDeathDate() != null && citizen.getDeathDate().isAfter(now())) {
-            throw new ValidationException("Citizen is invalid: \"deathDate\" can not be after current date!");
-        }
     }
 
     @Override
@@ -72,7 +50,6 @@ public class CitizensJdbcDao implements CitizensDao {
 
     @Override
     public Citizen save(Citizen citizen) {
-        validate(citizen);
         if (citizen.getId() == null) {
             return insert(citizen);
         } else {
@@ -116,7 +93,8 @@ public class CitizensJdbcDao implements CitizensDao {
     }
 
     @Override
-    public int deleteById(Long id) {
-        return jdbcTemplate.update("delete from citizen where id=?", new Object[]{id});
+    public void deleteById(Long id) {
+        int deletedRecs = jdbcTemplate.update("delete from citizen where id=?", new Object[]{id});
+        logger.debug("Deleleted records {} by id {}", deletedRecs, id);
     }
 }

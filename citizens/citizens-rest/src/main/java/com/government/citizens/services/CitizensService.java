@@ -28,7 +28,7 @@ public interface CitizensService {
      * @return
      * @throws CitizenNotFoundException if a citizen was not found
      */
-    int deleteById(Long id);
+    void deleteById(Long id);
 
     Citizen createCitizen(Citizen citizen);
 

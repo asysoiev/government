@@ -24,5 +24,5 @@ public interface CitizensDao {
      */
     Citizen save(Citizen citizen);
 
-    int deleteById(Long id);
+    void deleteById(Long id);
 }
