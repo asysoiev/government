@@ -5,6 +5,7 @@ import com.government.citizens.exceptions.CitizenNotFoundException;
 import com.government.citizens.models.Citizen;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.ValidationException;
 import java.util.List;
@@ -58,12 +59,14 @@ public class CitizensServiceImpl implements CitizensService {
         }
     }
 
+    @Transactional
     @Override
     public void deleteById(Long id) {
         findById(id);
         citizensDao.deleteById(id);
     }
 
+    @Transactional
     @Override
     public Citizen createCitizen(Citizen citizen) {
         if (isEmpty(citizen.getIdentifier())) {
@@ -72,6 +75,7 @@ public class CitizensServiceImpl implements CitizensService {
         return save(citizen);
     }
 
+    @Transactional
     @Override
     public Citizen updateCitizen(Citizen citizen) {
         Citizen dbCitizen = findById(citizen.getId());
@@ -92,7 +96,6 @@ public class CitizensServiceImpl implements CitizensService {
         return save(dbCitizen);
     }
 
-    //    @Transactional
     private Citizen save(Citizen citizen) {
         validate(citizen);
         return citizensDao.save(citizen);

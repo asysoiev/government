@@ -8,8 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.time.LocalDate;
 
 import static java.time.LocalDate.now;
@@ -30,9 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Integration tests for CitizensRest API.
+ * Base class of integration tests for CitizensRest API.
  * Checks all layers.
- * With default DB layer implementation - JPA.
  *
  * @author Andrii Sysoiev
  */
@@ -40,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
-public class CitizensRestControllerTest {
+public abstract class CitizensRestControllerTest {
 
     private static final String VALIDATION_ERR_MESSAGE = "Validation error!";
 
