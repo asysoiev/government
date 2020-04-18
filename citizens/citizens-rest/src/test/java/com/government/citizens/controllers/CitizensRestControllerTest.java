@@ -1,20 +1,25 @@
 package com.government.citizens.controllers;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import static java.time.LocalDate.now;
 import static java.time.LocalDate.of;
 import static java.time.Month.AUGUST;
+import static java.util.stream.Collectors.joining;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,9 +51,6 @@ public abstract class CitizensRestControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
     @Test
     void testGetAllCitizens() throws Exception {
         mockMvc.perform(get("/citizens"))
@@ -57,49 +59,19 @@ public abstract class CitizensRestControllerTest {
                 .andExpect(jsonPath("$.length()", is(6)));
     }
 
-    @Test
-    void testGetCitizen_NotFound() throws Exception {
-        long id = 888L;
-        Object[] params = {id};
-        int count = jdbcTemplate.queryForObject("select count(*) from citizen where id=?", params, Integer.class);
-        assertEquals(0, count);
-
-        MockHttpServletRequestBuilder request = get("/citizens/{1}", id);
-        mockMvc.perform(request)
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message", is(getCitizenNotFoundMessage(id))));
+    protected static String mapToStrictWherePairsString(Map<String, Object> params) {
+        return params.entrySet()
+                .stream()
+                .map(e -> e.getKey() + "=:" + e.getKey())
+                .collect(joining(" and "));
     }
 
-    /**
-     * Checks successful citizen creation.
-     * Identifier must be generated.
-     */
-    @Test
-    void testCreateCitizen() throws Exception {
-        String name = "Eric";
-        String surname = "Amber";
-        String gender = "M";
-        LocalDate birthday = of(now().minusYears(400).getYear(), AUGUST, 2);
-
-        String content = "{\n" +
-                "        \"name\": \"" + name + "\",\n" +
-                "        \"surname\": \"" + surname + "\",\n" +
-                "        \"birthday\": \"" + birthday.toString() + "\",\n" +
-                "        \"gender\": \"" + gender + "\"\n" +
-                " }";
-        MockHttpServletRequestBuilder request = post("/citizens")
-                .header(CONTENT_TYPE, APPLICATION_JSON)
-                .content(content);
-        mockMvc.perform(request)
-//                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(status().isCreated());
-
-        String query = "select count(*) " +
-                "from citizen " +
-                "where name=? and surname=? and gender=? and birthday=? and identifier is not null";
-        Object[] params = {name, surname, gender, birthday};
-        Integer count = jdbcTemplate.queryForObject(query, params, Integer.class);
-        assertEquals(1, count);
+    protected static String setToStrictWhereNotNullString(Set<String> notNullParams) {
+        if (CollectionUtils.isEmpty(notNullParams)) {
+            return "";
+        }
+        String notNullPattern = "%s is not null";
+        return " and " + notNullParams.stream().map(param -> String.format(notNullPattern, param)).collect(joining(" and "));
     }
 
     @Test
@@ -165,16 +137,74 @@ public abstract class CitizensRestControllerTest {
     }
 
     @Test
+    void testGetCitizen_NotFound() throws Exception {
+        //check before state
+        long id = 888L;
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", id);
+        int count = getCitizensCount(params);
+        assertEquals(0, count);
+
+        //call
+        MockHttpServletRequestBuilder request = get("/citizens/{1}", id);
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is(getCitizenNotFoundMessage(id))));
+    }
+
+    /**
+     * Checks successful citizen creation.
+     * Identifier must be generated.
+     */
+    @Test
+    void testCreateCitizen() throws Exception {
+        String name = "Eric";
+        String surname = "Amber";
+        String gender = "M";
+        LocalDate birthday = of(now().minusYears(400).getYear(), AUGUST, 2);
+
+        String content = "{\n" +
+                "        \"name\": \"" + name + "\",\n" +
+                "        \"surname\": \"" + surname + "\",\n" +
+                "        \"birthday\": \"" + birthday.toString() + "\",\n" +
+                "        \"gender\": \"" + gender + "\"\n" +
+                " }";
+        MockHttpServletRequestBuilder request = post("/citizens")
+                .header(CONTENT_TYPE, APPLICATION_JSON)
+                .content(content);
+        mockMvc.perform(request)
+//                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", name);
+        params.put("surname", surname);
+        params.put("gender", gender);
+        params.put("birthday", birthday);
+        Set<String> notNullParams = new HashSet<>();
+        notNullParams.add("identifier");
+        int count = getCitizensCount(params, notNullParams);
+        assertEquals(1, count);
+    }
+
+    @Test
     void testUpdateCitizen() throws Exception {
         //prepare data
         String name = "Oberon";
-        Object[] selectIdParams = {name};
-        String selectIdQuery = "select id from citizen where name=? and comment is null and death_date is null";
-        Long id = jdbcTemplate.queryForObject(selectIdQuery, selectIdParams, Long.class);
-        assertNotNull(id);
-
         LocalDate deathDate = of(now().minusYears(100).getYear(), AUGUST, 2);
         String comment = "Dead";
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", name);
+        Long id = getCitizenId(params);
+        assertNotNull(id);
+        //fields are null
+        params = new HashMap<>();
+        params.put("name", name);
+        params.put("comment", comment);
+        params.put("death_date", deathDate);
+        int count = getCitizensCount(params);
+        assertEquals(0, count);
 
         //request
         String content = "{\n" +
@@ -191,43 +221,70 @@ public abstract class CitizensRestControllerTest {
                 .andExpect(jsonPath("$.comment", is(comment)));
 
         //check result
-        String checkResultQuery = "select count(*) from citizen where name=? and death_date=? and comment=?";
-        Object[] checkResultParams = {name, deathDate, comment};
-        int count = jdbcTemplate.queryForObject(checkResultQuery, checkResultParams, Integer.class);
+        count = getCitizensCount(params);
         assertEquals(1, count);
     }
+
+    private static String getCitizenNotFoundMessage(long id) {
+        return String.format("Citizen: \"%d\" not found.", id);
+    }
+
+
+    //region Should be refactored.
+    /*
+    Have not found how to check jpa db changes by jdbctemplate.
+    JpaRepository does not flush changes until transaction is committed,
+    so jdbctemplate does not return expected values and we have to check changes by EntityManager.
+    See testCreateCitizen, testUpdateCitizen, testDeleteCitizen.
+     */
 
     /**
      * Checks successful citizen deletion.
      */
     @Test
     void testDeleteCitizen() throws Exception {
+        //prepare test data
         String name = "Oberon";
-        Object[] params = {name};
-        Long id = jdbcTemplate.queryForObject("select id from citizen where name=?", params, Long.class);
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", name);
+        Long id = getCitizenId(params);
 
+        //call
         MockHttpServletRequestBuilder request = delete("/citizens/{1}", id);
         mockMvc.perform(request)
                 .andExpect(status().isOk());
 
-        int count = jdbcTemplate.queryForObject("select count(*) from citizen where name=?", params, Integer.class);
+        //check
+        int count = getCitizensCount(params);
         assertEquals(0, count);
     }
 
     @Test
     void testDeleteCitizen_NotFound() throws Exception {
+        //check db state
         long id = 777L;
-        Object[] params = {id};
-        int count = jdbcTemplate.queryForObject("select count(*) from citizen where id=?", params, Integer.class);
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", id);
+        int count = getCitizensCount(params);
         assertEquals(0, count);
 
+        //call
         MockHttpServletRequestBuilder request = delete("/citizens/{1}", id);
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message", is(getCitizenNotFoundMessage(id))));
     }
 
-    private static String getCitizenNotFoundMessage(long id) {
-        return String.format("Citizen: \"%d\" not found.", id);
+    protected Long getCitizenId(Map<String, Object> params) {
+        return getCitizenId(params, new HashSet<>());
     }
+
+    protected abstract Long getCitizenId(Map<String, Object> params, Set<String> notNullParams);
+
+    protected int getCitizensCount(Map<String, Object> params) {
+        return getCitizensCount(params, new HashSet<>());
+    }
+
+    protected abstract int getCitizensCount(Map<String, Object> params, Set<String> notNullParams);
+    //endregion
 }
