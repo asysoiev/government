@@ -1,6 +1,5 @@
 package com.government.citizens.controllers;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -33,6 +32,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 /**
  * Base class of integration tests for CitizensRest API.
@@ -67,7 +67,7 @@ public abstract class CitizensRestControllerTest {
     }
 
     protected static String setToStrictWhereNotNullString(Set<String> notNullParams) {
-        if (CollectionUtils.isEmpty(notNullParams)) {
+        if (isEmpty(notNullParams)) {
             return "";
         }
         String notNullPattern = "%s is not null";
