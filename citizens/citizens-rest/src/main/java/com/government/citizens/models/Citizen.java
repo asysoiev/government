@@ -6,7 +6,9 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -23,19 +25,21 @@ public class Citizen {
     private Long id;
     @Column(name = "identifier")
     private UUID identifier;
-    @NotNull
+    @NotEmpty(message = "Citizen is invalid: \"name\" field is required!")
     @Column(name = "name")
     private String name;
-    @NotNull
+    @NotEmpty(message = "Citizen is invalid: \"surname\" field is required!")
     @Column(name = "surname")
     private String surname;
-    @NotNull
+    @NotNull(message = "Citizen is invalid: \"birthday\" field is required!")
+    @Past(message = "Citizen is invalid: \"birthday\" can not be after current date!")
     @Column(name = "birthday")
     private LocalDate birthday;
-    @NotNull
-    @Column(name = "gender")
+    @NotNull(message = "Citizen is invalid: \"gender\" field is required!")
     @Enumerated(STRING)
+    @Column(name = "gender")
     private Gender gender;
+    @Past(message = "Citizen is invalid: \"deathDate\" can not be after current date!")
     @Column(name = "death_date")
     private LocalDate deathDate;
     @Column(name = "comment")

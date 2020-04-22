@@ -191,6 +191,9 @@ public abstract class CitizensRestControllerTest {
     void testUpdateCitizen() throws Exception {
         //prepare data
         String name = "Oberon";
+        String surname = "Amber";
+        String gender = "M";
+        LocalDate birthday = now().minusYears(500);
         LocalDate deathDate = of(now().minusYears(100).getYear(), AUGUST, 2);
         String comment = "Dead";
 
@@ -208,6 +211,10 @@ public abstract class CitizensRestControllerTest {
 
         //request
         String content = "{\n" +
+                "        \"name\": \"" + name + "\",\n" +
+                "        \"surname\": \"" + surname + "\",\n" +
+                "        \"birthday\": \"" + birthday + "\",\n" +
+                "        \"gender\": \"" + gender + "\",\n" +
                 "        \"deathDate\": \"" + deathDate + "\",\n" +
                 "        \"comment\": \"" + comment + "\"\n" +
                 " }";

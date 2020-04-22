@@ -5,6 +5,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,6 +26,8 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @RestController
 public class CitizensExceptionHandler extends ResponseEntityExceptionHandler {
 
+    private static final String VALIDATION_MSG = "Validation error!";
+
     @ExceptionHandler(CitizenNotFoundException.class)
     public final ResponseEntity handleUserNotFoundException(CitizenNotFoundException ex, WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse()
@@ -35,23 +39,26 @@ public class CitizensExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ValidationException.class)
     public final ResponseEntity handleValidationException(ValidationException ex) {
         ExceptionResponse exceptionResponse = new ExceptionResponse()
-                .setMessage("Validation error!")
+                .setMessage(VALIDATION_MSG)
                 .setDetails(ex.getMessage());
         return new ResponseEntity(exceptionResponse, BAD_REQUEST);
     }
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        BindingResult bindingResult = ex.getBindingResult();
+        FieldError fieldError = bindingResult.getFieldError();
+        String details = fieldError.getDefaultMessage();
         ExceptionResponse exceptionResponse = new ExceptionResponse()
-                .setMessage("Validation error!")
-                .setDetails(ex.getBindingResult().toString());
+                .setMessage(VALIDATION_MSG)
+                .setDetails(details);
         return new ResponseEntity(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse()
-                .setMessage("Validation error!")
+                .setMessage(VALIDATION_MSG)
                 .setDetails(ex.getMessage());
         return new ResponseEntity(exceptionResponse, HttpStatus.BAD_REQUEST);
     }

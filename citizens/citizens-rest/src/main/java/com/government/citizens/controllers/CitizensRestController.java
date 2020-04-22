@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class CitizensRestController {
     }
 
     @PostMapping(path = "/citizens")
-    public ResponseEntity<Object> createCitizen(@RequestBody Citizen citizen) {
+    public ResponseEntity<Object> createCitizen(@Valid @RequestBody Citizen citizen) {
         Citizen saved = citizensService.createCitizen(citizen);
 
         URI location = ServletUriComponentsBuilder
@@ -48,7 +49,7 @@ public class CitizensRestController {
     }
 
     @PutMapping(path = "/citizens/{id}")
-    public ResponseEntity<Object> updateCitizen(@PathVariable Long id, @RequestBody Citizen citizen) {
+    public ResponseEntity<Object> updateCitizen(@PathVariable Long id, @Valid @RequestBody Citizen citizen) {
         citizen.setId(id);
         Citizen saved = citizensService.updateCitizen(citizen);
         return ResponseEntity.ok(saved);

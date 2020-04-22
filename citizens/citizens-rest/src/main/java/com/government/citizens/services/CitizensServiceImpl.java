@@ -7,11 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.ValidationException;
 import java.util.List;
 import java.util.Optional;
 
-import static java.time.LocalDate.now;
 import static java.util.UUID.randomUUID;
 import static org.springframework.util.StringUtils.isEmpty;
 
@@ -38,27 +36,6 @@ public class CitizensServiceImpl implements CitizensService {
         return result.get();
     }
 
-    private static void validate(Citizen citizen) {
-        if (isEmpty(citizen.getName())) {
-            throw new ValidationException("Citizen is invalid: \"name\" field is required!");
-        }
-        if (isEmpty(citizen.getSurname())) {
-            throw new ValidationException("Citizen is invalid: \"surname\" field is required!");
-        }
-        if (citizen.getBirthday() == null) {
-            throw new ValidationException("Citizen is invalid: \"birthday\" field is required!");
-        }
-        if (citizen.getBirthday().isAfter(now())) {
-            throw new ValidationException("Citizen is invalid: \"birthday\" can not be after current date!");
-        }
-        if (citizen.getGender() == null) {
-            throw new ValidationException("Citizen is invalid: \"gender\" field is required!");
-        }
-        if (citizen.getDeathDate() != null && citizen.getDeathDate().isAfter(now())) {
-            throw new ValidationException("Citizen is invalid: \"deathDate\" can not be after current date!");
-        }
-    }
-
     @Transactional
     @Override
     public void deleteById(Long id) {
@@ -72,7 +49,7 @@ public class CitizensServiceImpl implements CitizensService {
         if (isEmpty(citizen.getIdentifier())) {
             citizen.setIdentifier(randomUUID());
         }
-        return save(citizen);
+        return citizensDao.save(citizen);
     }
 
     @Transactional
@@ -93,11 +70,6 @@ public class CitizensServiceImpl implements CitizensService {
         }
         dbCitizen.setDeathDate(citizen.getDeathDate());
         dbCitizen.setComment(citizen.getComment());
-        return save(dbCitizen);
-    }
-
-    private Citizen save(Citizen citizen) {
-        validate(citizen);
-        return citizensDao.save(citizen);
+        return citizensDao.save(dbCitizen);
     }
 }
