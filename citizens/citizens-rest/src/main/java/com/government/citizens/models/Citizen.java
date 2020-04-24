@@ -39,6 +39,7 @@ public class Citizen {
     @Enumerated(STRING)
     @Column(name = "gender")
     private Gender gender;
+    //TODO: implement custom validator: must be after or eq birthday
     @Past(message = "Citizen is invalid: \"deathDate\" can not be after current date!")
     @Column(name = "death_date")
     private LocalDate deathDate;
