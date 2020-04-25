@@ -15,7 +15,7 @@ import java.util.Optional;
  */
 @Profile("JPA")
 @Repository
-public class CitizensJpaDaoAdapter implements CitizensDao {
+public class CitizensJpaRepoDaoAdapter implements CitizensDao {
 
     @Autowired
     private CitizensJpaRepository citizensJpaRepository;
@@ -39,7 +39,12 @@ public class CitizensJpaDaoAdapter implements CitizensDao {
     }
 
     @Override
-    public Citizen save(Citizen citizen) {
+    public Citizen insert(Citizen citizen) {
+        return citizensJpaRepository.save(citizen);
+    }
+
+    @Override
+    public Citizen update(Citizen citizen) {
         return citizensJpaRepository.save(citizen);
     }
 

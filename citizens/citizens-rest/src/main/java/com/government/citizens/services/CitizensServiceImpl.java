@@ -54,7 +54,7 @@ public class CitizensServiceImpl implements CitizensService {
         if (isEmpty(citizen.getIdentifier())) {
             citizen.setIdentifier(randomUUID());
         }
-        return citizensDao.save(citizen);
+        return citizensDao.insert(citizen);
     }
 
     @Transactional
@@ -75,6 +75,6 @@ public class CitizensServiceImpl implements CitizensService {
         }
         dbCitizen.setDeathDate(citizen.getDeathDate());
         dbCitizen.setComment(citizen.getComment());
-        return citizensDao.save(dbCitizen);
+        return citizensDao.update(dbCitizen);
     }
 }

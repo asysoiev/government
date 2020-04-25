@@ -2,7 +2,6 @@ package com.government.citizens.dao;
 
 import com.government.citizens.models.Citizen;
 
-import javax.validation.ValidationException;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,14 +16,9 @@ public interface CitizensDao {
 
     List<Citizen> findBySurname(String surname);
 
-    /**
-     * Stores citizen.
-     *
-     * @param citizen
-     * @return
-     * @throws ValidationException if citizen is invalid.
-     */
-    Citizen save(Citizen citizen);
+    Citizen insert(Citizen citizen);
+
+    Citizen update(Citizen citizen);
 
     void deleteById(Long id);
 }

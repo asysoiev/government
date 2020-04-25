@@ -56,15 +56,7 @@ public class CitizensJdbcDao implements CitizensDao {
     }
 
     @Override
-    public Citizen save(Citizen citizen) {
-        if (citizen.getId() == null) {
-            return insert(citizen);
-        } else {
-            return update(citizen);
-        }
-    }
-
-    private Citizen insert(Citizen citizen) {
+    public Citizen insert(Citizen citizen) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("citizen")
                 .usingGeneratedKeyColumns("id");
@@ -81,7 +73,8 @@ public class CitizensJdbcDao implements CitizensDao {
         return citizen;
     }
 
-    private Citizen update(Citizen citizen) {
+    @Override
+    public Citizen update(Citizen citizen) {
         jdbcTemplate.update("update citizen " +
                         "set name = ?, " +
                         "surname = ?, " +
