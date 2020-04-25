@@ -10,12 +10,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+
+import static org.hibernate.internal.util.StringHelper.isNotEmpty;
 
 /**
  * @author Andrii Sysoiev
@@ -27,7 +30,10 @@ public class CitizensRestController {
     private CitizensService citizensService;
 
     @GetMapping(path = "/citizens")
-    public List<Citizen> getAll() {
+    public List<Citizen> getCitizens(@RequestParam(name = "surname", required = false) String surname) {
+        if (isNotEmpty(surname)) {
+            return citizensService.findBySurname(surname);
+        }
         return citizensService.findAll();
     }
 

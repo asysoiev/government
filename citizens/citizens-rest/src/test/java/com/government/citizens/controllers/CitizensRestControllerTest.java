@@ -59,6 +59,14 @@ public abstract class CitizensRestControllerTest {
                 .andExpect(jsonPath("$.length()", is(6)));
     }
 
+    @Test
+    void testGetCitizensBySurname() throws Exception {
+        mockMvc.perform(get("/citizens").param("surname", "Amber"))
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(4)));
+    }
+
     protected static String mapToStrictWherePairsString(Map<String, Object> params) {
         return params.entrySet()
                 .stream()

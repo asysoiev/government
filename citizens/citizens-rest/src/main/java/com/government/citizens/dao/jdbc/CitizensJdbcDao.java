@@ -49,6 +49,13 @@ public class CitizensJdbcDao implements CitizensDao {
     }
 
     @Override
+    public List<Citizen> findBySurname(String surname) {
+        return jdbcTemplate.query("select * from citizen where surname=?",
+                new Object[]{surname},
+                new BeanPropertyRowMapper<>(Citizen.class));
+    }
+
+    @Override
     public Citizen save(Citizen citizen) {
         if (citizen.getId() == null) {
             return insert(citizen);

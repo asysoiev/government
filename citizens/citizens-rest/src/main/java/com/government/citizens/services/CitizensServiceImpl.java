@@ -36,6 +36,11 @@ public class CitizensServiceImpl implements CitizensService {
         return result.get();
     }
 
+    @Override
+    public List<Citizen> findBySurname(String surname) {
+        return citizensDao.findBySurname(surname);
+    }
+
     @Transactional
     @Override
     public void deleteById(Long id) {

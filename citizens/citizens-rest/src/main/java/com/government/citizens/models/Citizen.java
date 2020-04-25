@@ -17,6 +17,8 @@ import static javax.persistence.EnumType.STRING;
 /**
  * @author Andrii Sysoiev
  */
+//TODO:develop named query test
+//@NamedQuery()
 @Entity
 public class Citizen {
     @Id

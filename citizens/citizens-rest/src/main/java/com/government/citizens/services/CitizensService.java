@@ -39,4 +39,6 @@ public interface CitizensService {
      * @return
      */
     Citizen updateCitizen(Citizen citizen);
+
+    List<Citizen> findBySurname(String surname);
 }

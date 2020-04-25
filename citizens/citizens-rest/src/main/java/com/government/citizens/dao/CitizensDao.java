@@ -15,6 +15,8 @@ public interface CitizensDao {
 
     Optional<Citizen> findById(Long id);
 
+    List<Citizen> findBySurname(String surname);
+
     /**
      * Stores citizen.
      *
