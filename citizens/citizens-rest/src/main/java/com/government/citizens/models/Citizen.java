@@ -5,6 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -17,9 +19,13 @@ import static javax.persistence.EnumType.STRING;
 /**
  * @author Andrii Sysoiev
  */
-//TODO:develop named query test
-//@NamedQuery()
 @Entity
+@NamedQueries(
+        {
+                @NamedQuery(name = "Citizen.findAll", query = "select c from Citizen c"),
+                @NamedQuery(name = "Citizen.findBySurname", query = "select c from Citizen c where c.surname=:surname"),
+        }
+)
 public class Citizen {
     @Id
     @SequenceGenerator(name = "citizen_seq", allocationSize = 1, initialValue = 10000)

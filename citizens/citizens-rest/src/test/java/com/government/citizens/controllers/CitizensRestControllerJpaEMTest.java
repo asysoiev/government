@@ -16,8 +16,8 @@ import java.util.Set;
  *
  * @author Andrii Sysoiev
  */
-@ActiveProfiles("JPA")
-public class CitizensRestControllerJpaTest extends CitizensRestControllerTest {
+@ActiveProfiles("EntityManager")
+public class CitizensRestControllerJpaEMTest extends CitizensRestControllerTest {
 
     @PersistenceContext
     private EntityManager entityManager;

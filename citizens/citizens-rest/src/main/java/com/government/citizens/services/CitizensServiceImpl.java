@@ -44,8 +44,8 @@ public class CitizensServiceImpl implements CitizensService {
     @Transactional
     @Override
     public void deleteById(Long id) {
-        findById(id);
-        citizensDao.deleteById(id);
+        Citizen citizen = findById(id);
+        citizensDao.delete(citizen);
     }
 
     @Transactional

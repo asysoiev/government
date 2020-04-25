@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 /**
  * @author Andrii Sysoiev
  */
-@Profile("JPA")
+@Profile("JpaRepo")
 @Repository
 public interface CitizensJpaRepository extends JpaRepository<Citizen, Long> {
 }

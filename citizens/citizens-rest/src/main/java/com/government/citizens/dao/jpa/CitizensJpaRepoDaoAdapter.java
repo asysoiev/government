@@ -13,7 +13,7 @@ import java.util.Optional;
 /**
  * @author Andrii Sysoiev
  */
-@Profile("JPA")
+@Profile({"JpaRepo"})
 @Repository
 public class CitizensJpaRepoDaoAdapter implements CitizensDao {
 
@@ -49,7 +49,7 @@ public class CitizensJpaRepoDaoAdapter implements CitizensDao {
     }
 
     @Override
-    public void deleteById(Long id) {
-        citizensJpaRepository.deleteById(id);
+    public void delete(Citizen citizen) {
+        citizensJpaRepository.delete(citizen);
     }
 }

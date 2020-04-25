@@ -20,5 +20,5 @@ public interface CitizensDao {
 
     Citizen update(Citizen citizen);
 
-    void deleteById(Long id);
+    void delete(Citizen citizen);
 }

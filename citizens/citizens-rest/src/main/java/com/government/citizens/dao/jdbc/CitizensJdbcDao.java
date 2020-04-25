@@ -93,7 +93,8 @@ public class CitizensJdbcDao implements CitizensDao {
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void delete(Citizen citizen) {
+        Long id = citizen.getId();
         int deletedRecs = jdbcTemplate.update("delete from citizen where id=?", new Object[]{id});
         logger.debug("Deleleted records {} by id {}", deletedRecs, id);
     }
