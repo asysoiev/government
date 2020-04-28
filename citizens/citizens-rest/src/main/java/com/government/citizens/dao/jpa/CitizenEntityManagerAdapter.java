@@ -47,7 +47,7 @@ public class CitizenEntityManagerAdapter implements CitizensDao {
 
     @Override
     public Citizen update(Citizen citizen) {
-        entityManager.persist(citizen);
+        entityManager.merge(citizen);
         return citizen;
     }
 
